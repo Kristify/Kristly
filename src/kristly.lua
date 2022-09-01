@@ -242,10 +242,60 @@ end
 -- @param name The krist name that should get A record changed
 -- @param privatekey The krist private key that ownes the krist name
 -- @param newData The new data of the krist private key
+-- @return a table with a ok property
 function kristly.updateDataOfName(name, privatekey, newData)
   newData = newData or "Powered by Kristly"
 
   return basicJSONPOST("names/" .. name .. "/update", "privatekey=" .. privatekey .. "&newData=" .. newData)
+end
+
+----------------------------------------------------------------------------------
+--                                TRANSACTIONS                                  --
+----------------------------------------------------------------------------------
+
+--- Gets a list of transactions. This is not the latest transctions!
+-- @param excludeMined If we should exclude transactions coming from mining
+-- @param limit The max amount of transactions to return.
+-- @param offset The amount to offset the transaction list. Useful for pagination.
+-- @return a table with the following fields: count, total, transactions(tablearray of transactions).
+function kristly.listAllTransactions(excludeMined, limit, offset)
+  excludeMined = excludeMined or true
+  limit = limit or 50
+  offset = offset or 0
+
+  return basicGET("transactions?excludeMined=" .. excludeMined .. "&limit=" .. limit .. "&offset=" .. offset)
+end
+
+--- Gets a list of the latesttransactions.
+-- @param excludeMined If we should exclude transactions coming from mining
+-- @param limit The max amount of transactions to return.
+-- @param offset The amount to offset the transaction list. Useful for pagination.
+-- @return a table with the following fields: count, total, transactions(tablearray of transactions).
+function kristly.listLatestTransactions(excludeMined, limit, offset)
+  excludeMined = excludeMined or true
+  limit = limit or 50
+  offset = offset or 0
+
+  return basicGET("transactions/latest?excludeMined=" .. excludeMined .. "&limit=" .. limit .. "&offset=" .. offset)
+end
+
+--- Gets data about a specific transaction.
+-- @param transactionID the ID of the transaction.
+-- @return A table with one property: transaction
+function kristly.getTransaction(transactionID)
+  return basicGET("transactions/" .. transactionID)
+end
+
+--- Transfer the specified amount from the specified privatekey's address
+-- @param privatekey the krist privatekey of the address that the transaction should be from
+-- @param to the krist address of the person recieveing the krist
+-- @param amount the amount of krist to send
+-- @param metadata option parameter that will contain metadata
+function kristly.makeTransaction(privatekey, to, amount, metadata)
+  metadata = metadata or "Powered by = Kristify"
+
+  return basicJSONPOST("transactions",
+    "privatekey=" .. privatekey .. "&to=" .. to .. "&amount=" .. amount .. "&metadata=" .. metadata)
 end
 
 return kristly
