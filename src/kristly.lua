@@ -99,16 +99,75 @@ function kristly.getNames(address, limit, offset)
   return basicGET("addresses/" .. address .. "/names")
 end
 
-function kristly.addressFromKey(privateKey)
-  local res = basicJSONPOST("v2", "privatekey=" .. privateKey)
-
-  return res
-end
-
 ----------------------------------------------------------------------------------
---                                 BLOCKS                                      --
+--                                 BLOCKS                                       --
 ----------------------------------------------------------------------------------
 
 -- MINING IS DISABLED, BUT THIS PART WILL BE ADDED LATER
+
+----------------------------------------------------------------------------------
+--                                 LOOKUP API                                   --
+----------------------------------------------------------------------------------
+
+-- LOOKUP API IS IN BETA, MAY BE ADDED TO kristly IN THE FUTURE
+
+----------------------------------------------------------------------------------
+--                                  MISC                                        --
+----------------------------------------------------------------------------------
+
+--- Gets the current work
+-- @return a table with if it is ok and work which contains the current work.
+function kristly.getCurrentWork()
+  return basicGET("work")
+end
+
+--- Gets the work over the past 24h
+-- @return a table with if it is ok and a table of work
+function kristly.getLast24hWork()
+  return basicGET("work/day")
+end
+
+--- Gets detailed information about work/blocks
+-- @return a table with lots of information
+function kristly.getDetailedWorkInfo()
+  return basicGET("work/detailed")
+end
+
+--- Authenticates a address with a private key
+-- @param privatekey The privatekey of the address you want to authenticate
+-- @return a table with ok and authed key/value pairs
+function kristly.authenticate(privatekey)
+  return basicJSONPOST("https://krist.dev/login", "privatekey=" .. privatekey)
+end
+
+--- Gets information about the krist server (MOTD)
+-- @return table with lots of information. Specifications are over at krist.dev/docs
+function kristly.getMOTD()
+  return basicGET("motd")
+end
+
+--- Gets the latest krist wallet version
+-- @return a table with ok and walletVersion key/value pairs
+function kristly.getKristWalletVersion()
+  return basicGET("walletversion")
+end
+
+--- Gets the latests changes/commits to the krist project
+-- @return a table with ok, commits and whatsNew
+function kristly.getKristChanges()
+  return basicGET("whatsnew")
+end
+
+--- Gets the current supply of krist
+-- @return a table with ok and money_supply
+function kristly.getKristSupply()
+  return basicGET("supply")
+end
+
+--- Converts a private key into a krist address
+-- @return a table with ok and address porperty
+function kristly.addressFromKey(privateKey)
+  return basicJSONPOST("v2", "privatekey=" .. privateKey)
+end
 
 return kristly
