@@ -170,4 +170,82 @@ function kristly.addressFromKey(privateKey)
   return basicJSONPOST("v2", "privatekey=" .. privateKey)
 end
 
+----------------------------------------------------------------------------------
+--                                  NAMES                                       --
+----------------------------------------------------------------------------------
+
+--- Gets info about a krist name
+-- @return a table with information
+function kristly.getNameInfo(name)
+  return basicGET("names/" .. name)
+end
+
+--- Lists currently registered krist names
+-- @param limit number The limit of results
+-- @param offset The amount to offset the results
+-- @returns table with count, total, and a tablearray of names
+function kristly.getKristNames(limit, offset)
+  limit = limit or 50
+  offset = offset or 0
+
+  return basicGET("names?limit=" .. limit .. "&offset=" .. offset)
+end
+
+--- Lists currently registered krist names sorted by newest
+-- @param limit number The limit of results
+-- @param offset The amount to offset the results
+-- @returns table with count, total, and a tablearray of names
+function kristly.getNewestKristNames(limit, offset)
+  limit = limit or 50
+  offset = offset or 0
+
+  return basicGET("names/new?limit=" .. limit .. "&offset=" .. offset)
+end
+
+---Gets the price of a krist name
+-- @return a table with ok and name_cost properties
+function kristly.getNamePrice()
+  return basicGET("names/cost")
+end
+
+--- Gets the current name bonus. Simply: Amount of names bought in the latest 500 blocks
+-- @return a table with ok and name_bonus
+function kristly.getCurrentNameBonus()
+  return basicGET("names/bonus")
+end
+
+--- Check if the supplied krist name is available
+-- @param name The krist name
+-- @return a table with ok and available properties
+function kristly.isNameAvailable(name)
+  return basicGET("names/check/" .. name)
+end
+
+--- Tries to register a krist name
+-- @param name The krist name that should be registered
+-- @param privatekey The krist privatekey. This should never be shared.
+-- @return a table with a propery named ok. If ok is false it also contains a error property
+function kristly.purchaseName(name, privatekey)
+  return basicJSONPOST("names/" .. name, "privatekey=" .. privatekey)
+end
+
+--- Tries to transfer a name from one krist address to another krist address
+-- @param name The krist name that should be transferred
+-- @param fromPrivatekey The krist privatekey of the krist address the name will be transferred from
+-- @param addressTo The krist address that the name should be transferred to
+-- @return A table with ok propery and a name property if ok was true, or else a error property
+function kristly.transferName(name, addressTo, fromPrivatekey)
+  return basicJSONPOST("names/" .. name .. "/transfer?name=", "address=" .. addressTo .. "&privatekey=" .. fromPrivatekey)
+end
+
+--- Updates the data of a name, also knows as a A record
+-- @param name The krist name that should get A record changed
+-- @param privatekey The krist private key that ownes the krist name
+-- @param newData The new data of the krist private key
+function kristly.updateDataOfName(name, privatekey, newData)
+  newData = newData or "Powered by Kristly"
+
+  return basicJSONPOST("names/" .. name .. "/update", "privatekey=" .. privatekey .. "&newData=" .. newData)
+end
+
 return kristly
