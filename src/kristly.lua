@@ -1,4 +1,5 @@
 local kristly = {}
+local kristlyWS = { ws = nil, uid = nil }
 
 ----------------------------------------------------------------------------------
 --                                 UTILS                                        --
@@ -296,6 +297,43 @@ function kristly.makeTransaction(privatekey, to, amount, metadata)
 
   return basicJSONPOST("transactions",
     "privatekey=" .. privatekey .. "&to=" .. to .. "&amount=" .. amount .. "&metadata=" .. metadata)
+end
+
+----------------------------------------------------------------------------------
+--                                WEBSOCKETS                                    --
+----------------------------------------------------------------------------------
+
+function kristly.generateWSUrl(privatekey)
+  privatekey = privatekey or ""
+  return basicJSONPOST("ws/start", privatekey)
+end
+
+function kristly.websocket(privatekey)
+  local url = kristly.generateWSUrl(privatekey)
+  local ws = http.websocket(url.url)
+  local kws = kristlyWS:new { ws = ws, uid = uid }
+
+  return kws
+end
+
+function kristlyWS:new(o)
+  o = o or {}
+  setmetatable(o, self)
+  self.__index = self
+  return o
+end
+
+function kristlyWS:simpleWSMessage(type)
+  local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir()
+
+  self.ws.send(textutils.serialiseJSON {
+    id = id,
+    type = type
+  })
+end
+
+function kristlyWS:getWork()
+  self:simpleWSMessage "work"
 end
 
 return kristly
