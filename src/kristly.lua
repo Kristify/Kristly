@@ -303,6 +303,8 @@ end
 --                                WEBSOCKETS                                    --
 ----------------------------------------------------------------------------------
 
+local eventQueue = {}
+
 function kristly.generateWSUrl(privatekey)
   privatekey = privatekey or ""
   return basicJSONPOST("ws/start", privatekey)
@@ -336,13 +338,14 @@ function kristlyWS:simpleWSMessage(type, table)
 end
 
 function kristlyWS:simpleWSReceive(id)
-  local response = self.ws.receive(10)
+  local response = textutils.unserialiseJSON self.ws.receive(10)
   if response.id ~= id then
+    if response.type then eventQueue[#eventQueue + 1] = response end
     return self:simpleWSReceive(id)
   elseif response == nil then
     return nil, "Websocket timed out or disconnected."
   else
-    return textutils.unserialiseJSON response
+    return response
   end
 end
 
@@ -386,6 +389,12 @@ end
 function kristlyWS:upgradeConnection(privateKey)
   return self:simpleWSReceive self:simpleWSMessage("login", {
     privatekey = privateKey
+  })
+end
+
+function kristlyWS:toggleEvent(event)
+  return self:simpleWSReceive self:simpleWSMessage("subscribe", {
+    event = event
   })
 end
 
