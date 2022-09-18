@@ -1,5 +1,5 @@
 local kristly = {}
-local kristlyWS = { ws = nil, uid = nil }
+local kristlyWS = { ws = nil }
 
 ----------------------------------------------------------------------------------
 --                                 UTILS                                        --
@@ -311,7 +311,7 @@ end
 function kristly.websocket(privatekey)
   local url = kristly.generateWSUrl(privatekey)
   local ws = http.websocket(url.url)
-  local kws = kristlyWS:new { ws = ws, uid = uid }
+  local kws = kristlyWS:new { ws = ws }
 
   return kws
 end
@@ -323,17 +323,70 @@ function kristlyWS:new(o)
   return o
 end
 
-function kristlyWS:simpleWSMessage(type)
+function kristlyWS:simpleWSMessage(type, table)
   local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir()
+  
+  table = table or {}
+  table.id = id
+  table.type = type
 
-  self.ws.send(textutils.serialiseJSON {
-    id = id,
-    type = type
-  })
+  self.ws.send(textutils.serialiseJSON table)
+
+  return id
+end
+
+function kristlyWS:simpleWSReceive(id)
+  local response = self.ws.receive(10)
+  if response.id ~= id then
+    return self:simpleWSReceive(id)
+  elseif response == nil then
+    return nil, "Websocket timed out or disconnected."
+  else
+    return textutils.unserialiseJSON response
+  end
 end
 
 function kristlyWS:getWork()
-  self:simpleWSMessage "work"
+  return self:simpleWSReceive self:simpleWSMessage "work"
+end
+
+function kristlyWS:makeTransaction(recipient, amount, metadata)
+  metadata = metadata or "Powered by = Kristify"
+  return self:simpleWSReceive self:simpleWSMessage("make_transaction", {
+    to = recipient,
+    amount = amount,
+    metadata = metadata
+  }) 
+end
+
+function kristlyWS:getValidSubscriptionLevels()
+  return self:simpleWSReceive self:simpleWSMessage "get_valid_subscription_levels"
+end
+
+function kristlyWS:getAddress(address, fetchNames)
+  fetchNames = fetchNames or false
+  return self:simpleWSReceive self:simpleWSMessage("address", {
+    address = address,
+    fetchNames = fetchNames
+  })
+end
+
+function kristlyWS:getSelfInfo()
+  return self:simpleWSReceive self:simpleWSMessage "me"
+end
+
+function kristlyWS:getSubscriptionLevel()
+  return self:simpleWSReceive self:simpleWSMessage "get_subscription_level"
+end
+
+function kristlyWS:downgradeConnection()
+  return self:simpleWSReceive self:simpleWSMessage "logout"
+end
+
+function kristlyWS:upgradeConnection(privateKey)
+  return self:simpleWSReceive self:simpleWSMessage("login", {
+    privatekey = privateKey
+  })
 end
 
 return kristly
