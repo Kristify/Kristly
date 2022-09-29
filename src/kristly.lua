@@ -37,6 +37,8 @@ end
 -- @param address The krist address
 -- @return address table, with address, balance, totalin, totalout, and firstseen.
 function kristly.getAddress(address)
+  expect(1, address, "string")
+
   return basicGET("addresses/" .. address)
 end
 
@@ -45,6 +47,9 @@ end
 -- @param offset The amount of offset the results. Useful for pagination.
 -- @return table with count, total, and a addresses table, which contains the same data you would get from getAddress()
 function kristly.listAddresses(limit, offset)
+  expect(1, limit, "nil", "number")
+  expect(2, offset, "nil", "number")
+
   limit = limit or 50
   offset = offset or 0
 
@@ -56,6 +61,9 @@ end
 -- @param offset The amount of offset the results. Useful for pagination.
 -- @return table with count, total, and a addresses table, which contains the same data you would get from getAddress()
 function kristly.listRichestAddresses(limit, offset)
+  expect(1, limit, "nil", "number")
+  expect(2, offset, "nil", "number")
+
   limit = limit or 50
   offset = offset or 0
 
@@ -69,13 +77,17 @@ end
 -- @param offset The amount to offset the results, useful for pagination
 -- @return table with count, total, and a table array with transactions
 function kristly.getRecentTransactions(address, excludeMined, limit, offset)
+  expect(1, address, "string")
+  expect(2, excludeMined, "nil", "boolean")
+  expect(3, limit, "nil", "number")
+  expect(4, offset, "nil", "number")
+
   excludeMined = excludeMined or true
   limit = limit or 50
   offset = offset or 0
 
-  local res = basicGET("addresses/" ..
+  return basicGET("addresses/" ..
     address .. "/transactions?limit=" .. limit .. "&offset=" .. offset .. "&excludeMined=" .. excludeMined)
-  return res
 end
 
 --- Lists the names owned by a address
@@ -83,6 +95,10 @@ end
 -- @param limit The limit of names to return
 -- @param offset The amount to offset the results, useful for pagination
 function kristly.getNames(address, limit, offset)
+  expect(1, address, "string")
+  expect(2, limit, "nil", "number")
+  expect(3, offset, "nil", "number")
+
   limit = limit or 50
   offset = offset or 0
 
