@@ -303,13 +303,19 @@ end
 --                                WEBSOCKETS                                    --
 ----------------------------------------------------------------------------------
 
-local eventQueue = {}
+local eventQueue = {} -- Event queue 🤮
 
+--- Generates a krist websocket url.
+-- @param privatekey Optional: Privatekey of a wallet
+-- @return A url to connect to with websocket
 function kristly.generateWSUrl(privatekey)
   privatekey = privatekey or ""
   return basicJSONPOST("ws/start", privatekey)
 end
 
+--- Creates a new Kristly Websocket.
+-- @param privatekey Optional: the private key of the connection.
+-- @return a kristly ws object. Have fun with it!
 function kristly.websocket(privatekey)
   local url = kristly.generateWSUrl(privatekey)
   local ws = http.websocket(url.url)
@@ -318,6 +324,9 @@ function kristly.websocket(privatekey)
   return kws
 end
 
+--- Creates a new Kristly websocket object.
+-- @param o object with ws object inside.
+-- @return a instance of Kristly WS
 function kristlyWS:new(o)
   o = o or {}
   setmetatable(o, self)
@@ -325,27 +334,35 @@ function kristlyWS:new(o)
   return o
 end
 
+--- Sends a simple websocket message to the krist server
+-- @param type The action you would like to take
+-- @param table Optional arguments
+-- @return id The ID to listen after
 function kristlyWS:simpleWSMessage(type, table)
-  local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir()
+  local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir() -- Worlds best way to do it :troll: TODO:  make it more random possibly?
   
   table = table or {}
   table.id = id
   table.type = type
 
-  self.ws.send(textutils.serialiseJSON table)
+  self.ws.send(textutils.serialiseJSON(table))
 
   return id
 end
 
 function kristlyWS:simpleWSReceive(id)
   local response = textutils.unserialiseJSON self.ws.receive(10)
-  if response.id ~= id then
-    if response.type then eventQueue[#eventQueue + 1] = response end
-    return self:simpleWSReceive(id)
-  elseif response == nil then
+  
+  if response.id ~= id then -- If the id we got wasent what we was looking for
+    if response.type then -- If there is a type prop
+      table.insert(eventQueue, response); -- Add to event queue
+    end
+
+    return self:simpleWSReceive(id) -- Listen to the ID we got back? @EmeraldImpulse7 huh pls fix, i confused.
+  elseif response == nil then -- If there was no proper response
     return nil, "Websocket timed out or disconnected."
   else
-    return response
+    return response -- If everything as expected return the result.
   end
 end
 
