@@ -5,21 +5,6 @@ local kristlyWS = { ws = nil }
 --                                 UTILS                                        --
 ----------------------------------------------------------------------------------
 
-local function isOK(res, returnPath)
-  if not res.ok then
-    return {
-      ok = false,
-      error = res.error
-    }
-  end
-
-  if returnPath then
-    return res[returnPath]
-  end
-
-  return res
-end
-
 --- A basic JSON Post function to the krist api.
 -- Decodes the response from json into a table.
 -- @param endpoint The json endpoint. The first part of the url should not be included.
@@ -45,8 +30,7 @@ end
 -- @param address The krist address
 -- @return address table, with address, balance, totalin, totalout, and firstseen.
 function kristly.getAddress(address)
-  local res = basicGET("addresses/" .. address)
-  return isOK(res, "address")
+  return basicGET("addresses/" .. address)
 end
 
 --- Lists initized krist addresses.
@@ -57,8 +41,7 @@ function kristly.listAddresses(limit, offset)
   limit = limit or 50
   offset = offset or 0
 
-  local res = basicGET("addresses?limit=" .. limit .. "&offset=" .. offset)
-  return isOK(res)
+  return basicGET("addresses?limit=" .. limit .. "&offset=" .. offset)
 end
 
 --- Lists the richest krist addresses
@@ -69,8 +52,7 @@ function kristly.listRichestAddresses(limit, offset)
   limit = limit or 50
   offset = offset or 0
 
-  local res = basicGET("addresses/rich?limit=" .. limit .. "&offset=" .. offset)
-  return isOK(res)
+  return basicGET("addresses/rich?limit=" .. limit .. "&offset=" .. offset)
 end
 
 --- Lists the recent transactions for a address
