@@ -14,6 +14,8 @@ local kristlyWS = { ws = nil }
 -- @param body A stringified body
 -- @return table
 local function basicJSONPOST(endpoint, body)
+  expect(1, endpoint, "string")
+
   return textutils.unserializeJSON(http.post("https://krist.dev/" .. endpoint, body).readAll())
 end
 
@@ -22,6 +24,8 @@ end
 -- @param endpoint The GET endpoint. Do not include the first part of the url.
 -- @return table
 local function basicGET(endpoint)
+  expect(1, endpoint, "string")
+
   return textutils.unserializeJSON(http.get("https://krist.dev/" .. endpoint).readAll())
 end
 
