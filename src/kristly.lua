@@ -352,6 +352,8 @@ end
 -- @param privatekey Optional: Privatekey of a wallet
 -- @return A url to connect to with websocket
 function kristly.generateWSUrl(privatekey)
+  expect(1, privatekey, "nil", "string")
+
   privatekey = privatekey or ""
   return basicJSONPOST("ws/start", privatekey)
 end
@@ -360,6 +362,8 @@ end
 -- @param privatekey Optional: the private key of the connection.
 -- @return a kristly ws object. Have fun with it!
 function kristly.websocket(privatekey)
+  expect(1, privatekey, "nil", "string")
+
   local url = kristly.generateWSUrl(privatekey)
   local ws = http.websocket(url.url)
   local kws = kristlyWS:new { ws = ws }
@@ -371,6 +375,8 @@ end
 -- @param o object with ws object inside.
 -- @return a instance of Kristly WS
 function kristlyWS:new(o)
+  expect(1, o, "nil", "table")
+
   o = o or {}
   setmetatable(o, self)
   self.__index = self
@@ -382,6 +388,9 @@ end
 -- @param table Optional arguments
 -- @return id The ID to listen after
 function kristlyWS:simpleWSMessage(type, table)
+  expect(1, type, "string")
+  expect(2, table, "nil", "table")
+
   local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir() -- Worlds best way to do it :troll: TODO:  make it more random possibly?
 
   table = table or {}
@@ -415,6 +424,8 @@ end
 -- This will make a unauthed connection into a authed one
 -- @param privateKey The krist private key that you want to login to.
 function kristlyWS:upgradeConnection(privateKey)
+  expect(1, privateKey, "string")
+
   return self:simpleWSMessage("login", {
     privatekey = privateKey
   })
@@ -424,6 +435,8 @@ end
 -- This will make kristly recieve for example transaction events
 -- @param event The event to subscribe to.
 function kristlyWS:subscribe(event)
+  expect(1, event, "string")
+
   return self:simpleWSMessage("subscribe", {
     event = event
   })
