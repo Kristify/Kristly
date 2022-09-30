@@ -187,6 +187,8 @@ end
 --- Gets info about a krist name
 -- @return a table with information
 function kristly.getNameInfo(name)
+  expect(1, name, "string")
+
   return basicGET("names/" .. name)
 end
 
@@ -195,6 +197,9 @@ end
 -- @param offset The amount to offset the results
 -- @returns table with count, total, and a tablearray of names
 function kristly.getKristNames(limit, offset)
+  expect(1, limit, "nil", "number")
+  expect(2, offset, "nil", "number")
+
   limit = limit or 50
   offset = offset or 0
 
@@ -206,6 +211,9 @@ end
 -- @param offset The amount to offset the results
 -- @returns table with count, total, and a tablearray of names
 function kristly.getNewestKristNames(limit, offset)
+  expect(1, limit, "nil", "number")
+  expect(2, offset, "nil", "number")
+
   limit = limit or 50
   offset = offset or 0
 
@@ -228,6 +236,8 @@ end
 -- @param name The krist name
 -- @return a table with ok and available properties
 function kristly.isNameAvailable(name)
+  expect(1, name, "string")
+
   return basicGET("names/check/" .. name)
 end
 
@@ -236,6 +246,9 @@ end
 -- @param privatekey The krist privatekey. This should never be shared.
 -- @return a table with a propery named ok. If ok is false it also contains a error property
 function kristly.purchaseName(name, privatekey)
+  expect(1, name, "string")
+  expect(2, privatekey, "string")
+
   return basicJSONPOST("names/" .. name, "privatekey=" .. privatekey)
 end
 
@@ -245,6 +258,10 @@ end
 -- @param addressTo The krist address that the name should be transferred to
 -- @return A table with ok propery and a name property if ok was true, or else a error property
 function kristly.transferName(name, addressTo, fromPrivatekey)
+  expect(1, name, "string")
+  expect(2, addressTo, "string")
+  expect(3, fromPrivatekey, "string")
+
   return basicJSONPOST("names/" .. name .. "/transfer?name=", "address=" .. addressTo .. "&privatekey=" .. fromPrivatekey)
 end
 
@@ -254,6 +271,10 @@ end
 -- @param newData The new data of the krist private key
 -- @return a table with a ok property
 function kristly.updateDataOfName(name, privatekey, newData)
+  expect(1, name, "string")
+  expect(2, privatekey, "string")
+  expect(3, newData, "nil", "string")
+
   newData = newData or "Powered by Kristly"
 
   return basicJSONPOST("names/" .. name .. "/update", "privatekey=" .. privatekey .. "&newData=" .. newData)
