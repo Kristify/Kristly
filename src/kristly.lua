@@ -290,6 +290,10 @@ end
 -- @param offset The amount to offset the transaction list. Useful for pagination.
 -- @return a table with the following fields: count, total, transactions(tablearray of transactions).
 function kristly.listAllTransactions(excludeMined, limit, offset)
+  expect(1, excludeMined, "nil", "boolean")
+  expect(2, limit, "nil", "number")
+  expect(3, offset, "nil", "number")
+
   excludeMined = excludeMined or true
   limit = limit or 50
   offset = offset or 0
@@ -303,6 +307,10 @@ end
 -- @param offset The amount to offset the transaction list. Useful for pagination.
 -- @return a table with the following fields: count, total, transactions(tablearray of transactions).
 function kristly.listLatestTransactions(excludeMined, limit, offset)
+  expect(1, excludeMined, "nil", "boolean")
+  expect(2, limit, "nil", "number")
+  expect(3, offset, "nil", "number")
+
   excludeMined = excludeMined or true
   limit = limit or 50
   offset = offset or 0
@@ -314,6 +322,8 @@ end
 -- @param transactionID the ID of the transaction.
 -- @return A table with one property: transaction
 function kristly.getTransaction(transactionID)
+  expect(1, transactionID, "number")
+
   return basicGET("transactions/" .. transactionID)
 end
 
@@ -323,6 +333,11 @@ end
 -- @param amount the amount of krist to send
 -- @param metadata option parameter that will contain metadata
 function kristly.makeTransaction(privatekey, to, amount, metadata)
+  expect(1, privatekey, "string")
+  expect(2, to, "string")
+  expect(3, amount, "number")
+  expect(4, metadata, "nil", "string")
+
   metadata = metadata or "Powered by = Kristify"
 
   return basicJSONPOST("transactions",
