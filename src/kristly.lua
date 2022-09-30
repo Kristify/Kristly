@@ -143,6 +143,8 @@ end
 -- @param privatekey The privatekey of the address you want to authenticate
 -- @return a table with ok and authed key/value pairs
 function kristly.authenticate(privatekey)
+  expect(1, privatekey, "string")
+
   return basicJSONPOST("https://krist.dev/login", "privatekey=" .. privatekey)
 end
 
@@ -173,6 +175,8 @@ end
 --- Converts a private key into a krist address
 -- @return a table with ok and address porperty
 function kristly.addressFromKey(privateKey)
+  expect(1, privatekey, "string")
+
   return basicJSONPOST("v2", "privatekey=" .. privateKey)
 end
 
