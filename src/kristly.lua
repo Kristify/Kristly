@@ -308,8 +308,6 @@ end
 --                                WEBSOCKETS                                    --
 ----------------------------------------------------------------------------------
 
-local eventQueue = {} -- Event queue 🤮
-
 --- Generates a krist websocket url.
 -- @param privatekey Optional: Privatekey of a wallet
 -- @return A url to connect to with websocket
@@ -345,7 +343,7 @@ end
 -- @return id The ID to listen after
 function kristlyWS:simpleWSMessage(type, table)
   local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir() -- Worlds best way to do it :troll: TODO:  make it more random possibly?
-  
+
   table = table or {}
   table.id = id
   table.type = type
@@ -355,67 +353,38 @@ function kristlyWS:simpleWSMessage(type, table)
   return id
 end
 
-function kristlyWS:simpleWSReceive(id)
-  local response = textutils.unserialiseJSON self.ws.receive(10)
-  
-  if response.id ~= id then -- If the id we got wasent what we was looking for
-    if response.type then -- If there is a type prop
-      table.insert(eventQueue, response); -- Add to event queue
-    end
+--- Starts listening for events
+-- You should run this function with the parallel API
+function kristlyWS:start()
+  -- Listen for events. If returns nil it is safe to say the ws is closed.
+  -- Use os.queueEvent to send information back. Implement on and once later.
 
-    return self:simpleWSReceive(id) -- Listen to the ID we got back? @EmeraldImpulse7 huh pls fix, i confused.
-  elseif response == nil then -- If there was no proper response
-    return nil, "Websocket timed out or disconnected."
-  else
-    return response -- If everything as expected return the result.
+  while true do
+    local res = self.ws.receive(10)
+    print(res)
   end
 end
 
-function kristlyWS:getWork()
-  return self:simpleWSReceive self:simpleWSMessage "work"
-end
-
-function kristlyWS:makeTransaction(recipient, amount, metadata)
-  metadata = metadata or "Powered by = Kristify"
-  return self:simpleWSReceive self:simpleWSMessage("make_transaction", {
-    to = recipient,
-    amount = amount,
-    metadata = metadata
-  }) 
-end
-
-function kristlyWS:getValidSubscriptionLevels()
-  return self:simpleWSReceive self:simpleWSMessage "get_valid_subscription_levels"
-end
-
-function kristlyWS:getAddress(address, fetchNames)
-  fetchNames = fetchNames or false
-  return self:simpleWSReceive self:simpleWSMessage("address", {
-    address = address,
-    fetchNames = fetchNames
-  })
-end
-
-function kristlyWS:getSelfInfo()
-  return self:simpleWSReceive self:simpleWSMessage "me"
-end
-
-function kristlyWS:getSubscriptionLevel()
-  return self:simpleWSReceive self:simpleWSMessage "get_subscription_level"
-end
-
+--- Downgrades the WS connection.
+-- If you have a authed connection this will affectivly log you out.
 function kristlyWS:downgradeConnection()
-  return self:simpleWSReceive self:simpleWSMessage "logout"
+  return self:simpleWSMessage "logout"
 end
 
+--- Upgrade the WS connection.
+-- This will make a unauthed connection into a authed one
+-- @param privateKey The krist private key that you want to login to.
 function kristlyWS:upgradeConnection(privateKey)
-  return self:simpleWSReceive self:simpleWSMessage("login", {
+  return self:simpleWSMessage("login", {
     privatekey = privateKey
   })
 end
 
-function kristlyWS:toggleEvent(event)
-  return self:simpleWSReceive self:simpleWSMessage("subscribe", {
+--- Subscribe to a krist event
+-- This will make kristly recieve for example transaction events
+-- @param event The event to subscribe to.
+function kristlyWS:subscribe(event)
+  return self:simpleWSMessage("subscribe", {
     event = event
   })
 end
