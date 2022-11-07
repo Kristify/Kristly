@@ -94,7 +94,7 @@ end
 -- @param address the address to get names from
 -- @param limit The limit of names to return
 -- @param offset The amount to offset the results, useful for pagination
-function kristly.getNames(address, limit, offset)
+function kristly.getNamesOwnedBy(address, limit, offset)
   expect(1, address, "string")
   expect(2, limit, "nil", "number")
   expect(3, offset, "nil", "number")
