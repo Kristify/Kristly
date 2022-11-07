@@ -410,7 +410,9 @@ function kristlyWS:start()
 
   while true do
     local res = self.ws.receive(10)
-    print(res)
+    local data = textutils.unserializeJSON(res)
+
+    os.queueEvent(data.type, data)
   end
 end
 
