@@ -4,13 +4,9 @@
 ![GitHub License](https://img.shields.io/github/license/Kristify/Kristly?style=for-the-badge)
 ![Made For CC](https://img.shields.io/badge/Made%20for-ComputerCraft-orange?style=for-the-badge)
 
-A modern [krist](https://krist.dev/) library for [ComputerCraft (A Minecraft mod)](https://tweaked.cc/).
-Kristly is maintained by and made for [Kristify](https://github.com/Kristify).
+A modern [krist](https://krist.dev/) library for [ComputerCraft (Minecraft mod)](https://tweaked.cc/).
+Kristly is maintained by, and made for [Kristify](https://github.com/Kristify).
 
 ## Documentation
 
-Documentation can be found at our [Github Pages](https://kristify.github.io/kristly).
-
-## Story
-
-Kristly was made for a bounty that required a modern krist shop.
+Documentation for kristly can be found at [krist.dev](https://docs.krist.dev/docs/libraries/kristly.html).
