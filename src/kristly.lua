@@ -1,7 +1,7 @@
 local expect = require "cc.expect".expect
 
 local kristly = {}
-local kristlyWS = { ws = nil }
+local kristlyWS = { ws = nil, id = 0 }
 
 ----------------------------------------------------------------------------------
 --                                 UTILS                                        --
@@ -394,15 +394,15 @@ function kristlyWS:simpleWSMessage(type, table)
   expect(1, type, "string")
   expect(2, table, "nil", "table")
 
-  local id = os.clock() * os.getComputerID() * 2.5 + #shell.dir() -- Worlds best way to do it :troll: TODO:  make it more random possibly?
-
   table = table or {}
-  table.id = id
+  table.id = self.id
   table.type = type
 
   self.ws.send(textutils.serialiseJSON(table))
 
-  return id
+  self.id = self.id + 1
+
+  return self.id
 end
 
 ---Starts listening for events
