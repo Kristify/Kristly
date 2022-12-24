@@ -402,8 +402,26 @@ function kristlyWS:start()
   -- Use os.queueEvent to send information back. Implement on and once later.
 
   while true do
-    local res = self.ws.receive(10)
-    --TODO Add check if nil
+    local ok, returned = pcall(self.ws.receive(12)) -- Every 10s there should come a keepalive packet
+
+    if not ok then
+      os.queueEvent("kristly", {
+        type = "KRISTLY-ERROR",
+        errror = "DISCONNECTED"
+      })
+
+      return
+    end
+
+    if returned == nil then
+      os.queueEvent("kristly", {
+        type = "KRISTLY-ERROR",
+        errror = "NO-RESPONSE"
+      })
+
+      return
+    end
+
     local data = textutils.unserializeJSON(res)
 
     os.queueEvent("kristly", data)
