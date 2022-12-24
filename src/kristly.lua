@@ -3,9 +3,7 @@ local expect = require "cc.expect".expect
 local kristly = {}
 local kristlyWS = { ws = nil, id = 0 }
 
-----------------------------------------------------------------------------------
---                                 UTILS                                        --
-----------------------------------------------------------------------------------
+--#region Utilities
 
 ---A basic JSON Post function to the krist api.
 ---Decodes the response from json into a table.
@@ -29,9 +27,28 @@ local function basicGET(endpoint)
   return textutils.unserializeJSON(http.get("https://krist.dev/" .. endpoint).readAll())
 end
 
-----------------------------------------------------------------------------------
---                                ADDRESSES                                     --
-----------------------------------------------------------------------------------
+---Sends a simple websocket message to the krist server
+---@param type string The action you would like to take
+---@param table table|nil Optional arguments
+---@return number id The ID to listen after
+function kristlyWS:simpleWSMessage(type, table)
+  expect(1, type, "string")
+  expect(2, table, "nil", "table")
+
+  table = table or {}
+  table.id = self.id
+  table.type = type
+
+  self.ws.send(textutils.serialiseJSON(table))
+
+  self.id = self.id + 1
+
+  return self.id
+end
+
+--#endregion
+
+--#region Addresses
 
 ---Gets information about the supplied krist address.
 ---@param address string The krist address to get information about.
@@ -106,21 +123,13 @@ function kristly.getNamesOwnedBy(address, limit, offset)
   return basicGET("addresses/" .. address .. "/names")
 end
 
-----------------------------------------------------------------------------------
---                                 BLOCKS                                       --
-----------------------------------------------------------------------------------
+--#endregion
 
--- MINING IS DISABLED, BUT THIS PART WILL BE ADDED LATER
-
-----------------------------------------------------------------------------------
---                                 LOOKUP API                                   --
-----------------------------------------------------------------------------------
+-- MINING IS DISABLED. BLOCK API NOT ADDED
 
 -- LOOKUP API IS IN BETA, WILL BE ADDED TO kristly IN THE FUTURE
 
-----------------------------------------------------------------------------------
---                                  MISC                                        --
-----------------------------------------------------------------------------------
+--#region Miscellaneous
 
 ---Gets the current work
 ---@return table currentWork
@@ -182,9 +191,9 @@ function kristly.addressFromKey(privatekey)
   return basicJSONPOST("v2", "privatekey=" .. privatekey)
 end
 
-----------------------------------------------------------------------------------
---                                  NAMES                                       --
-----------------------------------------------------------------------------------
+--#endregion
+
+--#region Names
 
 ---Gets information about a krist name
 ---@param name string The name you want information about
@@ -283,9 +292,9 @@ function kristly.updateDataOfName(name, privatekey, newData)
   return basicJSONPOST("names/" .. name .. "/update", "privatekey=" .. privatekey .. "&newData=" .. newData)
 end
 
-----------------------------------------------------------------------------------
---                                TRANSACTIONS                                  --
-----------------------------------------------------------------------------------
+--#endregion
+
+--#region Transactions
 
 ---Gets a list of transactions. This is not the latest transctions!
 ---@param excludeMined boolean|nil If we should exclude transactions coming from mining
@@ -347,9 +356,9 @@ function kristly.makeTransaction(privatekey, to, amount, metadata)
     "privatekey=" .. privatekey .. "&to=" .. to .. "&amount=" .. amount .. "&metadata=" .. metadata)
 end
 
-----------------------------------------------------------------------------------
---                                WEBSOCKETS                                    --
-----------------------------------------------------------------------------------
+--#endregion
+
+--#region Websockets
 
 ---Generates a krist websocket url.
 ---@param privatekey string|nil Optional: Privatekey of a wallet
@@ -386,47 +395,29 @@ function kristlyWS:new(o)
   return o
 end
 
----Sends a simple websocket message to the krist server
----@param type string The action you would like to take
----@param table table|nil Optional arguments
----@return number id The ID to listen after
-function kristlyWS:simpleWSMessage(type, table)
-  expect(1, type, "string")
-  expect(2, table, "nil", "table")
-
-  table = table or {}
-  table.id = self.id
-  table.type = type
-
-  self.ws.send(textutils.serialiseJSON(table))
-
-  self.id = self.id + 1
-
-  return self.id
-end
-
----Starts listening for events
---- You should run this function with the parallel API
+---Start listening for websocket events
+---You should run this function with the parallel API
 function kristlyWS:start()
   -- Listen for events. If returns nil it is safe to say the ws is closed.
   -- Use os.queueEvent to send information back. Implement on and once later.
 
   while true do
     local res = self.ws.receive(10)
+    --TODO Add check if nil
     local data = textutils.unserializeJSON(res)
 
     os.queueEvent("kristly", data)
   end
 end
 
----Downgrades the WS connection.
---- If you have a authed connection this will affectivly log you out.
+---Downgrades the websocket connection.
+---If you have a authenticated connection this will affectivly log you out.
 function kristlyWS:downgradeConnection()
   return self:simpleWSMessage "logout"
 end
 
----Upgrade the WS connection.
---- This will make a unauthed connection into a authed one
+---Upgrade the websocket connection.
+---This will make a unauthenticated connection into a authenticated one
 ---@param privateKey string The krist private key that you want to login to.
 function kristlyWS:upgradeConnection(privateKey)
   expect(1, privateKey, "string")
@@ -437,7 +428,7 @@ function kristlyWS:upgradeConnection(privateKey)
 end
 
 ---Subscribe to a krist event
---- This will make kristly recieve for example transaction events
+---This will make kristly recieve for example transaction events
 ---@param event string The event to subscribe to.
 function kristlyWS:subscribe(event)
   expect(1, event, "string")
@@ -446,5 +437,7 @@ function kristlyWS:subscribe(event)
     event = event
   })
 end
+
+--#endregion
 
 return kristly
