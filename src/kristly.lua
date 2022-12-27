@@ -407,7 +407,7 @@ function kristlyWS:start()
     if not ok then
       os.queueEvent("kristly", {
         type = "KRISTLY-ERROR",
-        errror = "DISCONNECTED"
+        error = "DISCONNECTED"
       })
 
       return
@@ -416,7 +416,7 @@ function kristlyWS:start()
     if returned == nil then
       os.queueEvent("kristly", {
         type = "KRISTLY-ERROR",
-        errror = "NO-RESPONSE"
+        error = "NO-RESPONSE"
       })
 
       return
