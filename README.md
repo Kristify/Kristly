@@ -9,4 +9,4 @@ Kristly is maintained by, and made for [Kristify](https://github.com/Kristify).
 
 ## Documentation
 
-Documentation for kristly can **not** be found at [krist.dev](https://docs.krist.dev/docs/libraries/kristly.html), but in the code. We use LDoc.
+Documentation for kristly can **not** be found at [krist.dev](https://docs.krist.dev/docs/libraries/kristly.html), but in the code. We use LDoc / LuaDoc.

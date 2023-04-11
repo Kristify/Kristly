@@ -1,3 +1,7 @@
+-- Copyright © 2022-2023 Kristify
+-- MIT License
+-- WARNING: Has Bad Code TM
+
 local expect = require "cc.expect".expect
 
 local kristly = {}
