@@ -1,5 +1,12 @@
 # Kristly
 
+> [!IMPORTANT]
+> With SwitchCraft3 shutting down, we have decided to archive Kristify affective immediately.
+> This means no future updates, fixes, or support.
+> We thank everyone for the ride here.
+
+---
+
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Kristify/Kristly?label=Repo%20size&style=for-the-badge)
 ![GitHub License](https://img.shields.io/github/license/Kristify/Kristly?style=for-the-badge)
 ![Made For CC](https://img.shields.io/badge/Made%20for-ComputerCraft-orange?style=for-the-badge)
